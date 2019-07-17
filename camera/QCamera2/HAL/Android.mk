@@ -1,9 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_CLANG_CFLAGS += \
-        -Wno-error=unused-parameter
-
 LOCAL_SRC_FILES := \
     QCamera2Factory.cpp \
     QCamera2Hal.cpp \
@@ -40,10 +37,10 @@ LOCAL_CFLAGS += -DDEFAULT_DENOISE_MODE_ON
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/../stack/common \
     frameworks/native/include/media/openmax \
-    $(call project-path-for,qcom-display)/libgralloc \
-    $(call project-path-for,qcom-display)/libqdutils \
-    $(call project-path-for,qcom-display)/libqservice \
-    $(call project-path-for,qcom-media)/libstagefrighthw \
+    hardware/qcom/display-caf/msm8916/libgralloc \
+    hardware/qcom/display-caf/msm8916/libqdutils \
+    hardware/qcom/display-caf/msm8916/libqservice \
+    hardware/qcom/media-caf/msm8916/libstagefrighthw \
     system/media/camera/include \
     $(LOCAL_PATH)/../../mm-image-codec/qexif \
     $(LOCAL_PATH)/../../mm-image-codec/qomx_core \
@@ -65,7 +62,6 @@ LOCAL_SHARED_LIBRARIES += libmmcamera_interface libmmjpeg_interface libqdMetaDat
 ifeq ($(TARGET_TS_MAKEUP),true)
 LOCAL_SHARED_LIBRARIES += libts_face_beautify_hal libts_detected_face_hal
 endif
-LOCAL_HEADER_LIBRARIES := media_plugin_headers
 LOCAL_SHARED_LIBRARIES += libqdMetaData libqservice libbinder
 
 LOCAL_MODULE_RELATIVE_PATH := hw

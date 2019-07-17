@@ -684,7 +684,6 @@ int QCamera2HardwareInterface::take_picture(struct camera_device *device)
     }
 
     hw->unlockAPI();
-    hw->mLastCaptureTime = systemTime();
     CDBG_HIGH("[KPI Perf] %s: X", __func__);
     return ret;
 }
@@ -1039,8 +1038,6 @@ QCamera2HardwareInterface::QCamera2HardwareInterface(uint32_t cameraId)
       mRawdataJob(-1),
       mPreviewFrameSkipValid(0),
       mNumPreviewFaces(-1),
-      mLastAFScanTime(0),
-      mLastCaptureTime(0),
       mAdvancedCaptureConfigured(false),
       mFPSReconfigure(false),
       mVideoMem(NULL)
@@ -1291,11 +1288,6 @@ int QCamera2HardwareInterface::openCamera()
         gCamCapability[mCameraId]->padding_info.plane_padding = padding_info.plane_padding;
     }
 
-    // Hard-code padding for OnePlus X
-    gCamCapability[mCameraId]->padding_info.width_padding = CAM_PAD_TO_64;
-    gCamCapability[mCameraId]->padding_info.height_padding = CAM_PAD_TO_64;
-    gCamCapability[mCameraId]->padding_info.plane_padding = CAM_PAD_TO_64;
-
     mParameters.init(gCamCapability[mCameraId], mCameraHandle, this, this);
 
     mCameraOpened = true;
@@ -1519,8 +1511,7 @@ int QCamera2HardwareInterface::prepareTorchCamera()
     int rc = NO_ERROR;
 
     if ( ( !m_stateMachine.isPreviewRunning() ) &&
-            !m_stateMachine.isPreviewReady() &&
-            ( m_channels[QCAMERA_CH_TYPE_PREVIEW] == NULL ) ) {
+         ( m_channels[QCAMERA_CH_TYPE_PREVIEW] == NULL ) ) {
         rc = addChannel(QCAMERA_CH_TYPE_PREVIEW);
         waitDefferedWork(mMetadataJob);
     }
@@ -1543,8 +1534,7 @@ int QCamera2HardwareInterface::prepareTorchCamera()
 int QCamera2HardwareInterface::releaseTorchCamera()
 {
     if ( !m_stateMachine.isPreviewRunning() &&
-            !m_stateMachine.isPreviewReady() &&
-            ( m_channels[QCAMERA_CH_TYPE_PREVIEW] != NULL ) ) {
+         ( m_channels[QCAMERA_CH_TYPE_PREVIEW] != NULL ) ) {
         delete m_channels[QCAMERA_CH_TYPE_PREVIEW];
         m_channels[QCAMERA_CH_TYPE_PREVIEW] = NULL;
     }
@@ -4369,7 +4359,7 @@ int32_t QCamera2HardwareInterface::processHDRData(cam_asd_hdr_scene_data_t hdr_s
         }
     }
 
-    ALOGD("%s : hdr_scene_data: processHDRData: %d %f",
+    CDBG("%s : hdr_scene_data: processHDRData: %d %f",
           __func__,
           hdr_scene.is_hdr_scene,
           hdr_scene.hdr_confidence);
@@ -7354,14 +7344,12 @@ bool QCamera2HardwareInterface::isRegularCapture()
 {
     bool ret = false;
 
-#if 0
     if (numOfSnapshotsExpected() == 1 &&
         !isLongshotEnabled() &&
         !mParameters.getRecordingHintValue() &&
         !isZSLMode() && !(mParameters.isHDREnabled())) {
             ret = true;
     }
-#endif
     return ret;
 }
 
